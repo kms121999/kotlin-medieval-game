@@ -1,7 +1,3 @@
-import kotlin.math.abs
-import kotlin.math.log10
-import kotlin.math.pow
-
 /**
  * Gets player name and begins the game
  */
@@ -222,6 +218,9 @@ fun getIntInput() : Int {
     }
 }
 
+/**
+ * Pauses execution until user hits enter
+ */
 fun waitForEnter() {
     print("\nPress enter to continue...")
     readLine()
