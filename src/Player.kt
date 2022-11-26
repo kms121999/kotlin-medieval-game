@@ -19,6 +19,12 @@ class Player(val Name : String) {
 
 
     fun spend(amount : Int) : Boolean {
+        if (amount == -1) {
+            println("\nUnavailable for purchase")
+            waitForEnter()
+            return false
+        }
+
         if (amount <= silver) {
             silver -= amount
             return true
