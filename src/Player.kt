@@ -2,7 +2,7 @@ import kotlin.math.pow
 
 class Player(val Name : String) {
     // Initialize all buildings
-    private val buildings = mutableListOf<Building>(
+    private val buildings = mutableListOf(
         Building("castle"),
         Building("barracks"),
         Building("farm"),
@@ -24,8 +24,9 @@ class Player(val Name : String) {
             return true
         }
 
-        println("Insufficient funds")
-        return false;
+        println("\nInsufficient funds")
+        waitForEnter()
+        return false
     }
 
     private fun loseSilver(amount : Int) : Int {
@@ -79,8 +80,24 @@ class Player(val Name : String) {
         return level
     }
 
-    fun getPower() : Double {
-        return 0.0
+    fun getPower(inTown : Boolean = false) : Double {
+        var powerAccumulator = 0.0
+
+        for (item in inventory) {
+            powerAccumulator += item.getPower()
+        }
+
+        if (inTown) {
+            for (building in buildings) {
+                powerAccumulator += building.getPower()
+            }
+        }
+
+        return powerAccumulator
+    }
+
+    fun getEnemyPower() : Double {
+        return (level.toDouble().pow(2.0) * 9) + 200
     }
 
     fun levelUp() {
@@ -107,7 +124,7 @@ class Player(val Name : String) {
         for (item in inventory) {
             val amountLost = item.destroy((Math.random() * ((lossTier + 1.0).pow(6.0))).toInt())
 
-            if (amountLost > 0) println("You've lost $amountLost ${item.name}")
+            if (amountLost > 0) println("You've lost $amountLost ${item.name}s")
         }
 
         // Silver
@@ -118,7 +135,7 @@ class Player(val Name : String) {
         // Buildings
         if (townDamage && lossTier > 1) {
             for (building in buildings) {
-                var levelsLost = 0
+                var levelsLost : Int
                 if (building.getName() == "farm") {
                     levelsLost = building.destroy((Math.random() * 15 * lossTier).toInt())
 
@@ -135,6 +152,7 @@ class Player(val Name : String) {
     }
 
     fun displayStats() {
+        println("\nSTATS")
         println("Day ${getDays()}")
         println("Silver ${getSilver()}")
         for (building in buildings) {
@@ -143,30 +161,37 @@ class Player(val Name : String) {
         for (item in inventory) {
             item.display()
         }
-        println()
+        waitForEnter()
     }
 
-    fun startNewDay(possibleDamage : Int) {
+    fun startNewDay() {
+        println()
+
         daysPlayed += 1
 
         // 25% of the time, have bandits attack
         if (Math.random() < 0.25) {
+            val possibleDamage = getEnemyPower()
             println("Oh, no! Bandits are attacking!")
-            takeDamage((possibleDamage - getPower()).toInt(), townDamage = true)
+            takeDamage((possibleDamage - getPower(inTown = true)).toInt(), townDamage = true)
+            waitForEnter()
         }
 
-        collectSalary()
+        val salaryAmount = collectSalary()
+        println("You've collected $salaryAmount in taxes")
+
+        waitForEnter()
     }
 
     fun obtainLoot(victimStrength : Int) {
-        // TODO
+        addSilver(victimStrength)
     }
 
-    private fun collectSalary() {
-        addSilver(getLevel() * 1000)
-    }
+    private fun collectSalary() : Int {
+        val salaryAmount = getLevel() * 1000
 
-    fun getEffects(attribute : String) {
-        // TODO
+        addSilver(salaryAmount)
+
+        return salaryAmount
     }
 }
