@@ -7,13 +7,14 @@ import kotlin.math.pow
  */
 fun main(args : Array<String>) {
     // Prompt for name
-    println("Please enter your character's name:")
+    print("Please enter your character's name: ")
     val name = readLine()!!
 
     // Create the player object
     val player = Player(name)
 
     // Start the game
+    println()
     showMainMenu(player)
 }
 
@@ -63,11 +64,25 @@ fun showShopMenu(player : Player) {
 
     while (option != 0) {
         // Display menu
+        println("SHOP MENU")
         println("You have ${player.getSilver()} silver")
-        println("[1] Buy 50 swords for 100 silver\tYou have ${player.getItem("sword")?.getQuantity() ?: 0} swords")
-        println("[2] Buy 50 bows for 200 silver\tYou have ${player.getItem("bow")?.getQuantity() ?: 0} bows")
-        println("[3] Buy 50 armour for 200 silver\tYou have ${player.getItem("armour")?.getQuantity() ?: 0} armour")
-        println("[4] Buy 50 horses for 400 silver\tYou have ${player.getItem("horse")?.getQuantity() ?: 0} horses")
+
+        println("[1] Buy ${Item.getPurchaseInfo("sword")["qty"]} swords " +
+                "for ${Item.getPurchaseInfo("sword")["cost"]} silver\t" +
+                "You have ${player.getItem("sword")?.getQuantity() ?: 0} swords")
+
+        println("[2] Buy ${Item.getPurchaseInfo("bow")["qty"]} bows " +
+                "for ${Item.getPurchaseInfo("bow")["cost"]} silver  \t" +
+                "You have ${player.getItem("bow")?.getQuantity() ?: 0} bows")
+
+        println("[3] Buy ${Item.getPurchaseInfo("armour")["qty"]} armour " +
+                "for ${Item.getPurchaseInfo("armour")["cost"]} silver\t" +
+                "You have ${player.getItem("armour")?.getQuantity() ?: 0} armour")
+
+        println("[4] Buy ${Item.getPurchaseInfo("horse")["qty"]} horses " +
+                "for ${Item.getPurchaseInfo("horse")["cost"]} silver\t" +
+                "You have ${player.getItem("horse")?.getQuantity() ?: 0} horses")
+
         println("[0] Return to main menu")
 
         option = getIntInput()
@@ -115,6 +130,7 @@ fun showBuildMenu(player : Player) {
     // Loop
     while (option != 0) {
         // Display menu
+        println("BUILD MENU")
         println("You have ${player.getSilver()} silver")
         println("[1] Upgrade castle for ${player.getBuilding("castle").getUpgradeCost()}")
         println("[2] Upgrade barracks for ${player.getBuilding("barracks").getUpgradeCost()}")
@@ -159,11 +175,8 @@ fun showBuildMenu(player : Player) {
  * Attempts an attack against the bandits
  */
 fun executeAttack(player : Player) {
-    // Get the player's level
-    val x = player.getLevel().toDouble()
-
     // Calculate the enemies power based on player's level
-    val enemyPower = abs(100 * (-log10((x + 1).pow(2.0))) + (3 * (x + 1.7)).pow(2.0)) / (3 * log10(x+6)) + 100
+    val enemyPower = player.getEnemyPower()
 
     // Get the player's power
     val playerPower = player.getPower()
@@ -176,21 +189,17 @@ fun executeAttack(player : Player) {
         player.levelUp()
     } else {
         println("Run! There's too many of them!")
-        player.takeDamage((playerPower - enemyPower).toInt())
+        player.takeDamage((enemyPower - playerPower).toInt())
     }
+
+    waitForEnter()
 }
 
 /**
  * End the day
  */
 fun endDay(player : Player) {
-    // Get the player's level
-    val x = player.getLevel().toDouble()
-
-    // Calculate the enemies power based on player's level
-    val enemyPower = (abs(100 * (-log10((x + 1).pow(2.0))) + (3 * (x + 1.7)).pow(2.0)) / (3 * log10(x+6)) + 100)/100
-
-    player.startNewDay(enemyPower.toInt())
+    player.startNewDay()
 }
 
 /**
@@ -204,10 +213,17 @@ fun getIntInput() : Int {
     while (true) {
         try {
             // Get and return an int
+            print("Option: ")
             return readLine()!!.toInt()
         } catch (e : NumberFormatException) {
             // Prompt for an integer
             println("Please input an integer")
         }
     }
+}
+
+fun waitForEnter() {
+    print("\nPress enter to continue...")
+    readLine()
+    println()
 }
