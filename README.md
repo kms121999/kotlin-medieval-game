@@ -8,10 +8,7 @@ I developed this game—which uses many common features of Kotlin including func
 
 # Development Environment
 
-## Development Tools
 * IntelliJ IDEA 2022.2.2 (Community Edition)
-
-## Development Environment
 * JDK 13.0.1
 * Kotlin 1.7.20
 
